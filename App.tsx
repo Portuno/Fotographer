@@ -277,16 +277,25 @@ const App: React.FC = () => {
            </div>
            
            {/* Production Credit */}
-           <div className="mt-8 mb-4">
+           <div className="mt-8 mb-4 space-y-2">
               <p className="font-typewriter text-sm text-gray-400">
                 Una producción de <br/>
                 <a href="https://www.versaproducciones.com" target="_blank" rel="noopener noreferrer" className="font-elite text-lg text-red-800 hover:text-red-600 hover:underline tracking-widest uppercase">
                    VERSA PRODUCCIONES
                 </a>
               </p>
+              
+              <div className="text-xs md:text-sm font-mono text-gray-500 mt-4 space-y-1">
+                 <p>
+                   DIRECCIÓN: <span className="text-gray-300">CAMILA VERDUN LOMBA</span>
+                 </p>
+                 <p>
+                   PRODUCCIÓN: <span className="text-gray-300">LAUTARO J. SARNI</span>
+                 </p>
+              </div>
            </div>
 
-           <div className="flex justify-center gap-6 items-center">
+           <div className="flex justify-center gap-6 items-center mt-6">
               <a href="mailto:lautaro.sarni@gmail.com" className="text-gray-400 hover:text-red-500 transition-colors font-mono text-sm underline">
                 lautaro.sarni@gmail.com
               </a>

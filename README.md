@@ -1,20 +1,32 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# El Fotógrafo - Investigation Board
 
-# Run and deploy your AI Studio app
+Una experiencia web inmersiva para la película "El Fotógrafo", diseñada como una pizarra de investigación policial.
 
-This contains everything you need to run your app locally.
+## Sinopsis
+Tras años de silencio, la figura mítica de un artista urbano furtivo vuelve a aparecer en las calles de Valencia. Una periodista y un psicólogo investigan si se trata de su retorno o de un imitador que conoce demasiado bien su obra.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1vhYSjc1Ph__ttbyCntD-S-w3OvFb1Z7j
+## Créditos
 
-## Run Locally
+*   **Dirección:** Camila Verdun Lomba
+*   **Producción:** Lautaro J. Sarni
+*   **Productora:** [Versa Producciones](https://www.versaproducciones.com)
 
-**Prerequisites:**  Node.js
+## Redes Sociales
 
+*   **Película:** [@el_fotographer](https://www.instagram.com/el_fotographer/)
+*   **Camila Verdun Lomba:** [Instagram](https://www.instagram.com/)
+*   **Lautaro J. Sarni:** [Instagram](https://www.instagram.com/)
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Desarrollo y Despliegue (Deployment)
+
+Este proyecto está construido con **React** y **TailwindCSS**.
+
+### ¿Por qué veo una pantalla blanca?
+Si subiste los archivos `.tsx` directamente a un hosting, el navegador no sabrá cómo leerlos.
+Para producción, debes **compilar** el proyecto.
+
+Recomendación: Usa **Vite**.
+1.  `npm create vite@latest el-fotografo -- --template react-ts`
+2.  Copia los archivos de este proyecto a la carpeta `src`.
+3.  Ejecuta `npm run build`.
+4.  Sube la carpeta `dist` resultante a tu servidor.
