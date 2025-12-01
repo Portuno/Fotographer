@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { PushPin, Polaroid, TypedNote, ScotchTape } from './components/VisualElements';
-import { CAST_DATA, EVIDENCE_GALLERY } from './constants';
+import { CAST_DATA, EVIDENCE_GALLERY, INTRO_VIDEO, MAIN_PHOTO } from './constants';
 import { CastMember, EvidenceItem } from './types';
 
 // Icons
@@ -94,27 +94,34 @@ const App: React.FC = () => {
                </TypedNote>
             </div>
 
-            {/* Right side: Visual Evidence Cluster */}
-            <div className="md:col-span-7 relative h-64 md:h-auto" style={calculateParallax(0.01)}>
-               <div className="absolute top-0 right-10 z-10">
+            {/* Right side: Visual Evidence Cluster (Intro Video + Main Photo) */}
+            <div className="md:col-span-7 relative min-h-[400px] md:min-h-[500px]" style={calculateParallax(0.01)}>
+               {/* INTRO VIDEO POLAROID */}
+               <div className="absolute top-0 right-4 md:right-20 z-10 transition-transform hover:scale-105 duration-300">
                  <Polaroid 
-                    src="https://picsum.photos/300/200?grayscale&blur=2" 
-                    caption="Escena 1 - Reflejo" 
-                    rotation={4} 
-                    className="max-w-[200px] md:max-w-[240px]" 
+                    src={INTRO_VIDEO.url}
+                    caption={INTRO_VIDEO.title}
+                    rotation={INTRO_VIDEO.rotation}
+                    className="max-w-[200px] md:max-w-[280px]"
+                    onClick={() => setActiveEvidence(INTRO_VIDEO)}
+                    isVideo={true}
                   />
                </div>
-               <div className="absolute top-20 left-10 z-0">
+               
+               {/* MAIN PHOTO "El Fotógrapher" */}
+               <div className="absolute top-40 md:top-52 left-4 md:left-20 z-20 transition-transform hover:scale-105 duration-300">
                   <Polaroid 
-                    src="https://picsum.photos/300/300?grayscale" 
-                    caption="Sujeto desconocido" 
-                    rotation={-5} 
-                    className="max-w-[180px] md:max-w-[220px]" 
+                    src={MAIN_PHOTO.url} 
+                    caption={MAIN_PHOTO.title} 
+                    rotation={MAIN_PHOTO.rotation} 
+                    className="max-w-[180px] md:max-w-[260px]"
+                    onClick={() => setActiveEvidence(MAIN_PHOTO)}
                   />
                </div>
+               
                {/* Red string connecting photos */}
-               <svg className="absolute inset-0 pointer-events-none z-20 w-full h-full">
-                  <path d="M 100 150 Q 200 200 300 80" stroke="#7f1d1d" strokeWidth="2" fill="none" strokeDasharray="4,2" className="drop-shadow-sm opacity-80"/>
+               <svg className="absolute inset-0 pointer-events-none z-30 w-full h-full">
+                  <path d="M 150 250 Q 250 200 350 120" stroke="#7f1d1d" strokeWidth="3" fill="none" strokeDasharray="4,2" className="drop-shadow-sm opacity-80"/>
                </svg>
             </div>
         </section>
@@ -141,7 +148,7 @@ const App: React.FC = () => {
               </div>
             ))}
             
-            {/* Video Tape Placeholder - Keeping the aesthetic element as decor, or could be functional */}
+            {/* Video Tape Decor Element */}
             <div className="relative bg-black p-4 rounded shadow-2xl transform rotate-2 w-full flex flex-col items-center justify-center border-t-4 border-gray-800">
                <div className="w-full bg-gray-900 h-32 flex items-center justify-center border border-gray-700 mb-2 relative overflow-hidden group cursor-pointer">
                   <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 animate-pulse"></div>
@@ -151,7 +158,7 @@ const App: React.FC = () => {
                   </div>
                </div>
                <div className="bg-white w-full h-8 flex items-center justify-center font-marker text-black transform skew-x-[-10deg]">
-                 CINTA #4 (DAÑADA)
+                 PRUEBA #89
                </div>
             </div>
           </div>
@@ -284,7 +291,7 @@ const App: React.FC = () => {
                 lautaro.sarni@gmail.com
               </a>
               <span className="text-gray-600">|</span>
-              <a href="https://www.instagram.com/el_fotographer/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-500 transition-colors" aria-label="Instagram">
+              <a href="https://www.instagram.com/el_fotographer/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-500 transition-colors transform hover:scale-110" aria-label="Instagram">
                 <InstagramIcon />
               </a>
            </div>
