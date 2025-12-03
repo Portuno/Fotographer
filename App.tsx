@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { PushPin, Polaroid, TypedNote, ScotchTape } from './components/VisualElements';
 import { CAST_DATA, EVIDENCE_GALLERY, INTRO_VIDEO, MAIN_PHOTO } from './constants';
 import { CastMember, EvidenceItem } from './types';
+import { supabase, uploadFileToSupabase, getClientInfo, AnonymousTip, RecruitmentSubmission, ConfidentialContact } from './lib/supabase';
+import { sendEmail, emailTemplates } from './lib/resend';
 
 // Icons
 const CameraIcon = () => (
@@ -22,6 +24,21 @@ const App: React.FC = () => {
   const [activeFile, setActiveFile] = useState<CastMember | null>(null);
   const [activeEvidence, setActiveEvidence] = useState<EvidenceItem | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Estados para formularios
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  
+  // Estados para formulario de reclutamiento
+  const [recruitmentForm, setRecruitmentForm] = useState({ codeName: '', email: '' });
+  const [isSubmittingRecruitment, setIsSubmittingRecruitment] = useState(false);
+  const [recruitmentMessage, setRecruitmentMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  
+  // Estados para formulario de contacto
+  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '', subject: '' });
+  const [isSubmittingContact, setIsSubmittingContact] = useState(false);
+  const [contactMessage, setContactMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Mouse tracking for parallax and flashlight effect
   useEffect(() => {
@@ -37,6 +54,242 @@ const App: React.FC = () => {
     const x = (mousePos.x - window.innerWidth / 2) * factor;
     const y = (mousePos.y - window.innerHeight / 2) * factor;
     return { transform: `translate(${x}px, ${y}px)` };
+  };
+
+  // Handler para subir archivo (Buzón Anónimo)
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validar tipo de archivo (solo imágenes)
+      if (!file.type.startsWith('image/')) {
+        setUploadMessage({ type: 'error', text: 'Solo se permiten archivos de imagen' });
+        return;
+      }
+      // Validar tamaño (máximo 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setUploadMessage({ type: 'error', text: 'El archivo no puede ser mayor a 10MB' });
+        return;
+      }
+      setUploadedFile(file);
+      setUploadMessage(null);
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (!uploadedFile) {
+      setUploadMessage({ type: 'error', text: 'Por favor selecciona un archivo' });
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadMessage(null);
+
+    try {
+      // Subir archivo a Supabase Storage
+      const uploadResult = await uploadFileToSupabase(uploadedFile);
+      
+      if (!uploadResult) {
+        throw new Error('Error al subir el archivo');
+      }
+
+      const clientInfo = getClientInfo();
+
+      // Guardar en la base de datos
+      const { error: dbError } = await supabase
+        .from('anonymous_tips')
+        .insert({
+          file_url: uploadResult.url,
+          file_name: uploadedFile.name,
+          file_size: uploadedFile.size,
+          file_type: uploadedFile.type,
+          ...clientInfo
+        });
+
+      if (dbError) {
+        if (dbError.code === 'PGRST116' || dbError.message?.includes('404')) {
+          throw new Error('La tabla no existe. Por favor ejecuta los archivos SQL en Supabase primero.');
+        }
+        throw dbError;
+      }
+
+      // Enviar email con Resend (no bloquea si falla)
+      try {
+        const emailData = emailTemplates.newAnonymousTip(uploadedFile.name, uploadResult.url);
+        await sendEmail({
+          to: 'versaproducciones.es@gmail.com',
+          ...emailData
+        });
+      } catch (emailError) {
+        console.warn('Email no enviado (pero el archivo se subió):', emailError);
+      }
+
+      setUploadMessage({ type: 'success', text: 'Evidencia enviada correctamente' });
+      setUploadedFile(null);
+      
+      // Resetear input de archivo
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+    } catch (error: any) {
+      console.error('Error uploading file:', error);
+      const errorMessage = error?.message || 'Error desconocido';
+      
+      if (errorMessage.includes('tabla no existe') || error?.code === 'PGRST116') {
+        setUploadMessage({ 
+          type: 'error', 
+          text: 'Error: Las tablas de Supabase no están creadas. Revisa INSTRUCCIONES_SUPABASE.md' 
+        });
+      } else if (errorMessage.includes('JWT') || errorMessage.includes('API key')) {
+        setUploadMessage({ 
+          type: 'error', 
+          text: 'Error: Verifica tus credenciales de Supabase en .env.local' 
+        });
+      } else {
+        setUploadMessage({ type: 'error', text: `Error: ${errorMessage}` });
+      }
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Handler para formulario de reclutamiento
+  const handleRecruitmentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!recruitmentForm.codeName.trim() || !recruitmentForm.email.trim()) {
+      setRecruitmentMessage({ type: 'error', text: 'Por favor completa todos los campos' });
+      return;
+    }
+
+    setIsSubmittingRecruitment(true);
+    setRecruitmentMessage(null);
+
+    try {
+      const clientInfo = getClientInfo();
+
+      // Guardar en la base de datos
+      const { error: dbError } = await supabase
+        .from('recruitment_submissions')
+        .insert({
+          code_name: recruitmentForm.codeName.trim(),
+          email: recruitmentForm.email.trim(),
+          ...clientInfo
+        });
+
+      if (dbError) {
+        // Error más descriptivo
+        if (dbError.code === 'PGRST116' || dbError.message?.includes('404')) {
+          throw new Error('La tabla no existe. Por favor ejecuta los archivos SQL en Supabase primero.');
+        }
+        throw dbError;
+      }
+
+      // Enviar email con Resend (no bloquea si falla)
+      try {
+        const emailData = emailTemplates.newRecruitment(recruitmentForm.codeName, recruitmentForm.email);
+        await sendEmail({
+          to: 'versaproducciones.es@gmail.com',
+          ...emailData
+        });
+      } catch (emailError) {
+        console.warn('Email no enviado (pero el formulario se guardó):', emailError);
+        // No mostramos error al usuario si el email falla, ya que los datos se guardaron
+      }
+
+      setRecruitmentMessage({ type: 'success', text: 'Formulario enviado correctamente' });
+      setRecruitmentForm({ codeName: '', email: '' });
+    } catch (error: any) {
+      console.error('Error submitting recruitment:', error);
+      const errorMessage = error?.message || 'Error desconocido';
+      
+      if (errorMessage.includes('tabla no existe') || error?.code === 'PGRST116') {
+        setRecruitmentMessage({ 
+          type: 'error', 
+          text: 'Error: Las tablas de Supabase no están creadas. Revisa INSTRUCCIONES_SUPABASE.md' 
+        });
+      } else if (errorMessage.includes('JWT') || errorMessage.includes('API key')) {
+        setRecruitmentMessage({ 
+          type: 'error', 
+          text: 'Error: Verifica tus credenciales de Supabase en .env.local' 
+        });
+      } else {
+        setRecruitmentMessage({ type: 'error', text: `Error: ${errorMessage}` });
+      }
+    } finally {
+      setIsSubmittingRecruitment(false);
+    }
+  };
+
+  // Handler para formulario de contacto confidencial
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!contactForm.email.trim() || !contactForm.message.trim()) {
+      setContactMessage({ type: 'error', text: 'Por favor completa email y mensaje' });
+      return;
+    }
+
+    setIsSubmittingContact(true);
+    setContactMessage(null);
+
+    try {
+      const clientInfo = getClientInfo();
+
+      // Guardar en la base de datos
+      const { error: dbError } = await supabase
+        .from('confidential_contacts')
+        .insert({
+          name: contactForm.name.trim() || null,
+          email: contactForm.email.trim(),
+          message: contactForm.message.trim(),
+          subject: contactForm.subject.trim() || null,
+          ...clientInfo
+        });
+
+      if (dbError) {
+        if (dbError.code === 'PGRST116' || dbError.message?.includes('404')) {
+          throw new Error('La tabla no existe. Por favor ejecuta los archivos SQL en Supabase primero.');
+        }
+        throw dbError;
+      }
+
+      // Enviar email con Resend (no bloquea si falla)
+      try {
+        const emailData = emailTemplates.newContact(
+          contactForm.name,
+          contactForm.email,
+          contactForm.message,
+          contactForm.subject
+        );
+        await sendEmail({
+          to: 'versaproducciones.es@gmail.com',
+          ...emailData
+        });
+      } catch (emailError) {
+        console.warn('Email no enviado (pero el mensaje se guardó):', emailError);
+      }
+
+      setContactMessage({ type: 'success', text: 'Mensaje enviado correctamente' });
+      setContactForm({ name: '', email: '', message: '', subject: '' });
+    } catch (error: any) {
+      console.error('Error submitting contact:', error);
+      const errorMessage = error?.message || 'Error desconocido';
+      
+      if (errorMessage.includes('tabla no existe') || error?.code === 'PGRST116') {
+        setContactMessage({ 
+          type: 'error', 
+          text: 'Error: Las tablas de Supabase no están creadas. Revisa INSTRUCCIONES_SUPABASE.md' 
+        });
+      } else if (errorMessage.includes('JWT') || errorMessage.includes('API key')) {
+        setContactMessage({ 
+          type: 'error', 
+          text: 'Error: Verifica tus credenciales de Supabase en .env.local' 
+        });
+      } else {
+        setContactMessage({ type: 'error', text: `Error: ${errorMessage}` });
+      }
+    } finally {
+      setIsSubmittingContact(false);
+    }
   };
 
   return (
@@ -265,16 +518,59 @@ const App: React.FC = () => {
                     ¿Has visto algo? Sube tus fotos. No se rastreará tu IP.
                   </p>
                   
-                  <div className="border-2 border-dashed border-gray-500 rounded bg-white/50 p-8 text-center cursor-pointer hover:bg-white/80 transition-colors group-hover:border-red-800">
+                  <label 
+                    htmlFor="file-upload"
+                    className="border-2 border-dashed border-gray-500 rounded bg-white/50 p-8 text-center cursor-pointer hover:bg-white/80 transition-colors group-hover:border-red-800 block"
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const file = e.dataTransfer.files?.[0];
+                      if (file && file.type.startsWith('image/')) {
+                        if (file.size > 10 * 1024 * 1024) {
+                          setUploadMessage({ type: 'error', text: 'El archivo no puede ser mayor a 10MB' });
+                          return;
+                        }
+                        setUploadedFile(file);
+                        setUploadMessage(null);
+                      } else if (file) {
+                        setUploadMessage({ type: 'error', text: 'Solo se permiten archivos de imagen' });
+                      }
+                    }}
+                  >
                      <div className="mx-auto w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mb-2">
                        <span className="text-2xl text-gray-600">+</span>
                      </div>
-                     <span className="text-sm uppercase font-bold text-gray-600">Arrastrar evidencia aquí</span>
-                     <input type="file" className="hidden" />
-                  </div>
+                     <span className="text-sm uppercase font-bold text-gray-600">
+                       {uploadedFile ? uploadedFile.name : 'Arrastrar evidencia aquí'}
+                     </span>
+                     <input 
+                       id="file-upload"
+                       type="file" 
+                       accept="image/*"
+                       className="hidden" 
+                       onChange={handleFileChange}
+                     />
+                  </label>
+                  {uploadMessage && (
+                    <div className={`mt-3 text-sm font-bold ${uploadMessage.type === 'success' ? 'text-green-700' : 'text-red-700'}`}>
+                      {uploadMessage.text}
+                    </div>
+                  )}
                   <div className="mt-4 text-right">
-                     <button className="bg-red-800 text-white font-elite px-6 py-2 shadow-lg hover:bg-red-900 transform active:scale-95 transition-transform">
-                       ENVIAR
+                     <button 
+                       onClick={handleFileUpload}
+                       disabled={isUploading || !uploadedFile}
+                       className="bg-red-800 text-white font-elite px-6 py-2 shadow-lg hover:bg-red-900 transform active:scale-95 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+                     >
+                       {isUploading ? 'ENVIANDO...' : 'ENVIAR'}
                      </button>
                   </div>
                </div>
@@ -292,18 +588,39 @@ const App: React.FC = () => {
                     Únete a la Investigación
                   </h4>
                   
-                  <form className="space-y-4">
+                  <form onSubmit={handleRecruitmentSubmit} className="space-y-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre Clave</label>
-                      <input type="text" className="w-full bg-gray-100 border-b-2 border-gray-300 focus:border-red-800 outline-none p-2 font-mono text-black transition-colors" />
+                      <input 
+                        type="text" 
+                        value={recruitmentForm.codeName}
+                        onChange={(e) => setRecruitmentForm({ ...recruitmentForm, codeName: e.target.value })}
+                        className="w-full bg-gray-100 border-b-2 border-gray-300 focus:border-red-800 outline-none p-2 font-mono text-black transition-colors" 
+                        required
+                      />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Contacto (Email)</label>
-                      <input type="email" className="w-full bg-gray-100 border-b-2 border-gray-300 focus:border-red-800 outline-none p-2 font-mono text-black transition-colors" />
+                      <input 
+                        type="email" 
+                        value={recruitmentForm.email}
+                        onChange={(e) => setRecruitmentForm({ ...recruitmentForm, email: e.target.value })}
+                        className="w-full bg-gray-100 border-b-2 border-gray-300 focus:border-red-800 outline-none p-2 font-mono text-black transition-colors" 
+                        required
+                      />
                     </div>
+                    {recruitmentMessage && (
+                      <div className={`text-xs font-bold ${recruitmentMessage.type === 'success' ? 'text-green-700' : 'text-red-700'}`}>
+                        {recruitmentMessage.text}
+                      </div>
+                    )}
                     <div className="pt-2">
-                      <button type="button" className="w-full border-2 border-black py-2 font-bold text-black hover:bg-black hover:text-white transition-colors uppercase text-sm">
-                        Firmar Acuerdo
+                      <button 
+                        type="submit" 
+                        disabled={isSubmittingRecruitment}
+                        className="w-full border-2 border-black py-2 font-bold text-black hover:bg-black hover:text-white transition-colors uppercase text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isSubmittingRecruitment ? 'ENVIANDO...' : 'Firmar Acuerdo'}
                       </button>
                     </div>
                   </form>
@@ -322,6 +639,61 @@ const App: React.FC = () => {
               <div className="relative bg-black text-white px-8 py-4 font-elite text-xl border-2 border-white/20">
                  CONTACTO CONFIDENCIAL
               </div>
+           </div>
+           
+           {/* Formulario de Contacto Confidencial */}
+           <div className="mt-8 max-w-md mx-auto">
+             <form onSubmit={handleContactSubmit} className="bg-[#f0f0f0] p-6 shadow-lg border-2 border-gray-400 space-y-4">
+               <div>
+                 <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Nombre (Opcional)</label>
+                 <input 
+                   type="text" 
+                   value={contactForm.name}
+                   onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                   className="w-full bg-white border-b-2 border-gray-300 focus:border-red-800 outline-none p-2 font-mono text-black transition-colors" 
+                 />
+               </div>
+               <div>
+                 <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Email *</label>
+                 <input 
+                   type="email" 
+                   value={contactForm.email}
+                   onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                   className="w-full bg-white border-b-2 border-gray-300 focus:border-red-800 outline-none p-2 font-mono text-black transition-colors" 
+                   required
+                 />
+               </div>
+               <div>
+                 <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Asunto (Opcional)</label>
+                 <input 
+                   type="text" 
+                   value={contactForm.subject}
+                   onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
+                   className="w-full bg-white border-b-2 border-gray-300 focus:border-red-800 outline-none p-2 font-mono text-black transition-colors" 
+                 />
+               </div>
+               <div>
+                 <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Mensaje *</label>
+                 <textarea 
+                   value={contactForm.message}
+                   onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                   className="w-full bg-white border-2 border-gray-300 focus:border-red-800 outline-none p-2 font-mono text-black transition-colors min-h-[100px]" 
+                   required
+                 />
+               </div>
+               {contactMessage && (
+                 <div className={`text-xs font-bold ${contactMessage.type === 'success' ? 'text-green-700' : 'text-red-700'}`}>
+                   {contactMessage.text}
+                 </div>
+               )}
+               <button 
+                 type="submit" 
+                 disabled={isSubmittingContact}
+                 className="w-full bg-red-800 text-white font-elite px-6 py-2 shadow-lg hover:bg-red-900 transform active:scale-95 transition-transform disabled:opacity-50 disabled:cursor-not-allowed uppercase"
+               >
+                 {isSubmittingContact ? 'ENVIANDO...' : 'ENVIAR MENSAJE'}
+               </button>
+             </form>
            </div>
            
            {/* Production Credit */}
@@ -344,8 +716,8 @@ const App: React.FC = () => {
            </div>
 
            <div className="flex justify-center gap-6 items-center mt-6">
-              <a href="mailto:lautaro.sarni@gmail.com" className="text-gray-400 hover:text-red-500 transition-colors font-mono text-sm underline">
-                lautaro.sarni@gmail.com
+              <a href="mailto:versaproducciones.es@gmail.com" className="text-gray-400 hover:text-red-500 transition-colors font-mono text-sm underline">
+                versaproducciones.es@gmail.com
               </a>
               <span className="text-gray-600">|</span>
               <a href="https://www.instagram.com/el_fotographer/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-500 transition-colors transform hover:scale-110" aria-label="Instagram">
