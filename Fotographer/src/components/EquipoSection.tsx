@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 
 const EquipoSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -11,11 +11,15 @@ const EquipoSection = () => {
           setIsVisible(true);
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.1 }
     );
 
     const section = document.getElementById('equipo');
-    if (section) observer.observe(section);
+    if (section) {
+      observer.observe(section);
+      // Fallback: make visible if section exists
+      setIsVisible(true);
+    }
 
     return () => observer.disconnect();
   }, []);
@@ -24,27 +28,30 @@ const EquipoSection = () => {
     {
       name: "LAUTARO J. SARNI",
       role: "Productor",
-      image: "https://i.ibb.co/4gd2KRH2/image.jpg",
+      image: "https://ibb.co/4gd2KRH2",
       notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     },
     {
       name: "CAMILA VERDÚN LOMBA",
       role: "Directora",
-      image: "https://i.ibb.co/Pvzp6zqq/image.jpg",
+      image: "https://ibb.co/Pvzp6zqq",
       notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     },
     {
       name: "FACUNDO J. HERNANDEZ",
       role: "Director de Fotografía",
-      image: "https://i.ibb.co/FqjQ2RDc/image.jpg",
+      image: "https://ibb.co/FqjQ2RDc",
       notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     }
   ];
 
+  // Debug: verificar que los datos están correctos
+  console.log('EquipoSection - teamMembers:', teamMembers);
+
   return (
     <section id="equipo" className="py-20 bg-[#3E2723]">
       <div className="container mx-auto px-4">
-        <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className="opacity-100">
           {/* Title */}
           <div className="mb-12">
             <div className="flex items-center gap-3">
@@ -79,14 +86,13 @@ const EquipoSection = () => {
                         src={member.image} 
                         alt={member.name}
                         className="w-full h-full object-cover"
+                        loading="lazy"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
-                          const placeholder = target.nextElementSibling as HTMLElement;
-                          if (placeholder) placeholder.style.display = 'flex';
                         }}
                       />
-                      <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs font-light" style={{ display: 'none' }}>
+                      <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs font-light pointer-events-none">
                         {member.name.split(' ')[0]}
                       </div>
                     </div>
