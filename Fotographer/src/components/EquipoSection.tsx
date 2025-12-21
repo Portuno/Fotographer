@@ -1,8 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { User, Mail, Heart, Users } from 'lucide-react';
 
 const EquipoSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -25,33 +22,23 @@ const EquipoSection = () => {
 
   const teamMembers = [
     {
-      name: "Lautaro J. Sarni",
+      name: "LAUTARO J. SARNI",
       role: "Productor",
       image: "https://i.ibb.co/4gd2KRH2",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris."
+      notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     },
     {
-      name: "Camila Verdún Lomba",
+      name: "CAMILA VERDÚN LOMBA",
       role: "Directora",
       image: "https://i.ibb.co/Pvzp6zqq",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris."
+      notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     },
     {
-      name: "Facundo J. Hernandez",
+      name: "FACUNDO J. HERNANDEZ",
       role: "Director de Fotografía",
       image: "https://i.ibb.co/FqjQ2RDc",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris."
+      notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     }
-  ];
-
-  const collaboratorRoles = [
-    "Director de Fotografía",
-    "Operador de Cámara",
-    "Técnico de Sonido",
-    "Técnico de Iluminación",
-    "Extras y Actores",
-    "Músicos y Compositores",
-    "Ayudantes de Producción"
   ];
 
   return (
@@ -59,125 +46,73 @@ const EquipoSection = () => {
       <div className="container mx-auto px-4">
         <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           {/* Title */}
-          <div className="text-center mb-16">
-            <h2 className="font-bebas text-6xl md:text-7xl text-primary mb-4">
-              EQUIPO
-            </h2>
-            <div className="w-24 h-1 bg-secondary mx-auto mb-6"></div>
-            <p className="font-montserrat text-lg text-foreground/70 max-w-2xl mx-auto">
-              El talento humano detrás de "El Fotógrapher". Un proyecto no-budget impulsado por 
-              la pasión y la colaboración.
-            </p>
+          <div className="mb-16">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-1 h-12 bg-[#8B4513]"></div>
+              <h2 className="font-bebas text-5xl md:text-6xl text-[#8B4513] font-bold tracking-wide">
+                PERFILES DE INTERÉS
+              </h2>
+            </div>
           </div>
 
-          {/* Core Team */}
-          <div className="mb-16">
-            <h3 className="font-playfair text-3xl text-primary text-center mb-12">Equipo Principal</h3>
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {teamMembers.map((member, index) => (
-                <Card 
-                  key={member.name}
-                  className={`bg-card/30 backdrop-blur-sm border-border/50 hover-scale ${
-                    index % 2 === 1 ? 'dutch-angle' : ''
-                  }`}
-                >
-                  <CardContent className="p-8">
-                    <div className="flex flex-col items-center mb-6">
+          {/* Profiles Grid */}
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {teamMembers.map((member, index) => (
+              <div 
+                key={member.name}
+                className="relative bg-[#F5F5DC] rounded-sm shadow-lg p-6 border border-[#D3D3D3]"
+                style={{
+                  backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(0,0,0,0.05) 1px, transparent 0)',
+                  backgroundSize: '20px 20px'
+                }}
+              >
+                {/* Pin */}
+                <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-blue-500 rounded-full shadow-md flex items-center justify-center z-10">
+                  <div className="w-4 h-4 bg-blue-600 rounded-full"></div>
+                </div>
+
+                {/* Content */}
+                <div className="mt-4">
+                  <div className="flex gap-4 mb-4">
+                    {/* Image */}
+                    <div className="w-24 h-24 bg-gray-200 rounded-sm flex-shrink-0 border border-gray-300 overflow-hidden">
                       {member.image && (
                         <img 
                           src={member.image} 
                           alt={member.name}
-                          className="w-24 h-24 rounded-full object-cover mb-4 border-2 border-secondary/30"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
                         />
                       )}
-                      <div className="text-center">
-                        <h4 className="font-playfair text-xl font-bold text-primary">
-                          {member.name}
-                        </h4>
-                        <p className="font-montserrat text-secondary font-medium">
-                          {member.role}
-                        </p>
-                      </div>
                     </div>
 
-                    <p className="font-montserrat text-foreground/80 leading-relaxed text-sm">
-                      {member.description}
+                    {/* Name */}
+                    <div className="flex-1">
+                      <h3 className="font-bold text-lg text-gray-900 mb-2 leading-tight">
+                        {member.name}
+                      </h3>
+                      {/* Role Box */}
+                      <div className="bg-black text-white px-3 py-1 inline-block text-xs font-semibold">
+                        {member.role}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Notes Section */}
+                  <div className="mb-4">
+                    <p className="text-xs font-semibold text-gray-700 mb-1">NOTAS:</p>
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      {member.notes}
                     </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Collaboration Call */}
-          <div className="max-w-4xl mx-auto">
-            <Card className="bg-card/20 backdrop-blur-sm border-border/30">
-              <CardContent className="p-8">
-                <div className="text-center mb-8">
-                  <Users className="h-12 w-12 text-secondary mx-auto mb-4" />
-                  <h3 className="font-playfair text-2xl text-primary mb-4">
-                    ¿Quieres Ser Parte del Proyecto?
-                  </h3>
-                  <p className="font-montserrat text-foreground/80 leading-relaxed">
-                    "El Fotógrapher" es un proyecto colaborativo que busca talento apasionado. 
-                    Si sientes que puedes contribuir a esta historia, ¡nos encantaría conocerte!
-                  </p>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6 mb-8">
-                  <div>
-                    <h4 className="font-playfair text-lg text-primary mb-4">Buscamos:</h4>
-                    <div className="grid grid-cols-1 gap-2">
-                      {collaboratorRoles.map((role) => (
-                        <div key={role} className="flex items-center">
-                          <div className="w-2 h-2 bg-secondary rounded-full mr-3"></div>
-                          <span className="font-montserrat text-sm text-foreground/80">{role}</span>
-                        </div>
-                      ))}
-                    </div>
                   </div>
 
-                  <div>
-                    <h4 className="font-playfair text-lg text-primary mb-4">Ofrecemos:</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center">
-                        <div className="w-2 h-2 bg-secondary rounded-full mr-3"></div>
-                        <span className="font-montserrat text-sm text-foreground/80">Experiencia en producción cinematográfica</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-2 h-2 bg-secondary rounded-full mr-3"></div>
-                        <span className="font-montserrat text-sm text-foreground/80">Créditos en el proyecto</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-2 h-2 bg-secondary rounded-full mr-3"></div>
-                        <span className="font-montserrat text-sm text-foreground/80">Colaboración en un proyecto artístico único</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-2 h-2 bg-secondary rounded-full mr-3"></div>
-                        <span className="font-montserrat text-sm text-foreground/80">Networking en el mundo audiovisual</span>
-                      </div>
-                    </div>
-                  </div>
+                  {/* Bottom Placeholder */}
+                  <div className="h-8 bg-gray-200 rounded-sm border border-gray-300 mt-2"></div>
                 </div>
-
-                <div className="text-center">
-                  <Button 
-                    size="lg"
-                    className="bg-secondary hover:bg-secondary/90 text-white font-montserrat font-semibold mr-4"
-                  >
-                    <Mail className="mr-2 h-5 w-5" />
-                    Únete al Proyecto
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="lg"
-                    className="border-primary text-primary hover:bg-primary hover:text-background font-montserrat font-semibold"
-                  >
-                    Más Información
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            ))}
           </div>
         </div>
       </div>
