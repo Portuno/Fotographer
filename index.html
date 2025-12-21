@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>El Fotógrafo - Caso Abierto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Permanent+Marker&family=Special+Elite&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>">
+    <style>
+      body {
+        cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23b91c1c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M22 12h-4"/><path d="M6 12H2"/><path d="M12 6V2"/><path d="M12 22v-4"/></svg>') 12 12, auto;
+      }
+      .font-typewriter { font-family: 'Courier Prime', monospace; }
+      .font-marker { font-family: 'Permanent Marker', cursive; }
+      .font-elite { font-family: 'Special Elite', cursive; }
+      
+      /* Corkboard Texture */
+      .bg-cork {
+        background-color: #3f2e21;
+        background-image: url("https://www.transparenttextures.com/patterns/cork-board.png");
+      }
+      
+      /* Noise Overlay */
+      .noise-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background: url('https://grainy-gradients.vercel.app/noise.svg');
+        opacity: 0.05;
+        z-index: 50;
+      }
+      
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #1a1a1a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #4a4a4a;
+        border: 1px solid #000;
+      }
+      
+      /* Hide scrollbar for evidence carousel */
+      .evidence-carousel {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .evidence-carousel::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+</head>
+  <body class="bg-stone-900 text-stone-100 overflow-x-hidden">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
