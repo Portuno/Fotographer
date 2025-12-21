@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 
+// Componente actualizado - Perfiles de Interés 2024
 const EquipoSection = () => {
   const [isVisible, setIsVisible] = useState(true);
 
@@ -24,7 +25,7 @@ const EquipoSection = () => {
     return () => observer.disconnect();
   }, []);
 
-  // PERFILES DE INTERÉS - Actualizado 2024
+  // PERFILES DE INTERÉS - Actualizado 2024 - Build v3 - FORCE UPDATE
   const teamMembers = [
     {
       name: "LAUTARO J. SARNI",
@@ -45,6 +46,11 @@ const EquipoSection = () => {
       notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     }
   ];
+
+  // Debug: Log para verificar que se está usando el código correcto
+  if (typeof window !== 'undefined') {
+    console.log('EquipoSection - teamMembers actualizados:', teamMembers);
+  }
 
   return (
     <section id="equipo" className="py-20 bg-[#3E2723]">
