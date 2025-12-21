@@ -24,29 +24,27 @@ const EquipoSection = () => {
     return () => observer.disconnect();
   }, []);
 
+  // PERFILES DE INTERÉS - Actualizado 2024
   const teamMembers = [
     {
       name: "LAUTARO J. SARNI",
       role: "Productor",
-      image: "https://ibb.co/4gd2KRH2",
+      image: null, // URL directa necesaria
       notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     },
     {
       name: "CAMILA VERDÚN LOMBA",
       role: "Directora",
-      image: "https://ibb.co/Pvzp6zqq",
+      image: null, // URL directa necesaria
       notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     },
     {
       name: "FACUNDO J. HERNANDEZ",
       role: "Director de Fotografía",
-      image: "https://ibb.co/FqjQ2RDc",
+      image: null, // URL directa necesaria
       notes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     }
   ];
-
-  // Debug: verificar que los datos están correctos
-  console.log('EquipoSection - teamMembers:', teamMembers);
 
   return (
     <section id="equipo" className="py-20 bg-[#3E2723]">
@@ -82,16 +80,18 @@ const EquipoSection = () => {
                   <div className="flex gap-3 mb-3">
                     {/* Image */}
                     <div className="w-20 h-20 bg-gray-200 rounded-sm flex-shrink-0 border border-gray-300 overflow-hidden flex items-center justify-center relative">
-                      <img 
-                        src={member.image} 
-                        alt={member.name}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                        }}
-                      />
+                      {member.image ? (
+                        <img 
+                          src={member.image} 
+                          alt={member.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      ) : null}
                       <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs font-light pointer-events-none">
                         {member.name.split(' ')[0]}
                       </div>
