@@ -3,30 +3,27 @@ import { CastMember, EvidenceItem } from './types';
 export const CAST_DATA: CastMember[] = [
   {
     id: 'c1',
-    name: 'Julian V.',
-    role: 'El Fotógrafo',
-    description: 'Obsesivo. Rara vez visto sin su cámara. Visto por última vez cerca del muelle.',
-    // Imagen local: Subir a public/images/julian.jpg
-    imageUrl: '/images/julian.jpg',
-    status: 'suspect',
+    name: 'Lautaro J. Sarni',
+    role: 'Productor',
+    description: 'Experto en coordinar recursos y gestionar la producción desde las sombras. Su capacidad para organizar operaciones complejas lo convierte en una pieza clave del equipo. Maneja los hilos invisibles que mantienen todo en movimiento.',
+    imageUrl: 'https://i.ibb.co/4gd2KRH2/lautaro.jpg',
+    status: 'witness',
   },
   {
     id: 'c2',
-    name: 'Elena R.',
-    role: 'La Periodista',
-    description: 'Investigando desapariciones locales. Archivos confidenciales encontrados en su apartamento.',
-    // Imagen local: Subir a public/images/elena.jpg
-    imageUrl: '/images/elena.jpg',
+    name: 'Camila Verdún Lomba',
+    role: 'Directora',
+    description: 'Visión estratégica y liderazgo en la dirección del proyecto. Su mirada aguda captura cada detalle de la narrativa, guiando la investigación hacia su verdadero objetivo. Experta en desentrañar misterios visuales.',
+    imageUrl: 'https://i.ibb.co/Pvzp6zqq/camila.jpg',
     status: 'witness',
   },
   {
     id: 'c3',
-    name: 'Det. Marcos',
-    role: 'Investigador Jefe',
-    description: 'Historial de casos sin resolver. Se sospecha corrupción interna.',
-    // Imagen local: Subir a public/images/marcos.jpg
-    imageUrl: '/images/marcos.jpg',
-    status: 'unknown',
+    name: 'Facundo J. Hernandez',
+    role: 'Director de Fotografía',
+    description: 'Maestro de la luz y las sombras. Su ojo experto transforma cada escena en evidencia visual. Conoce los secretos de la composición y el encuadre, capturando momentos que otros pasarían por alto.',
+    imageUrl: 'https://i.ibb.co/FqjQ2RDc/facundo.jpg',
+    status: 'witness',
   },
 ];
 
