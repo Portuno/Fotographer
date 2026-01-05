@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { PushPin, Polaroid, TypedNote, ScotchTape } from './components/VisualElements';
 import { CAST_DATA, EVIDENCE_GALLERY, INTRO_VIDEO, MAIN_PHOTO } from './constants';
 import { CastMember, EvidenceItem } from './types';
@@ -808,6 +809,7 @@ const App: React.FC = () => {
         </div>
       )}
 
+      <Analytics />
     </div>
   );
 };
