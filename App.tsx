@@ -341,7 +341,7 @@ const App: React.FC = () => {
                <TypedNote rotation={-2} className="w-full md:w-5/6 mx-auto">
                  <h2 className="font-bold text-lg mb-2 underline decoration-red-500 decoration-wavy">SINOPSIS</h2>
                  <p>
-                   Tras años de silencio, la figura mítica de un artista urbano furtivo vuelve a aparecer en las calles de Valencia. Una periodista y un psicólogo investigan si se trata de su retorno o de un imitador que conoce demasiado bien su obra.
+                   Tras tres años desde su desaparición, vuelve a aparecer El <em>Fotógrapher</em>, un artista urbano furtivo de la ciudad de Valencia. Una periodista obsesiva y un psicólogo paranoico se deciden a investigarlo, evitando caer en la locura.
                  </p>
                  <br/>
                  <p className="font-marker text-red-700 text-xl text-right transform -rotate-2">¿Quién vigila?</p>

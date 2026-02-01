@@ -39,15 +39,9 @@ const SinopsisSection = () => {
             <Card className="noir-card">
               <CardContent className="p-12">
                 <p className="font-montserrat text-lg md:text-xl leading-relaxed text-foreground/90 mb-8">
-                  En las calles de <span className="text-secondary font-medium">Valencia</span>, dos amigos recorren la ciudad 
-                  buscando las misteriosas obras de <span className="text-primary font-medium">"El Fotógrafo"</span>, un artista 
-                  urbano que captura personas anónimas y las convierte en arte callejero.
-                </p>
-                
-                <p className="font-montserrat text-lg md:text-xl leading-relaxed text-foreground/90 mb-8">
-                  <span className="text-secondary font-medium">Lupe</span> y <span className="text-secondary font-medium">Marian</span> documentan 
-                  su búsqueda, sin saber que él ya los ha encontrado. Una historia sobre ser visto, 
-                  existir y la delgada línea entre el observador y lo observado.
+                  Tras tres años desde su desaparición, vuelve a aparecer El <em className="text-primary font-medium">Fotógrapher</em>, un artista 
+                  urbano furtivo de la ciudad de <span className="text-secondary font-medium">Valencia</span>. Una periodista obsesiva y un psicólogo 
+                  paranoico se deciden a investigarlo, evitando caer en la locura.
                 </p>
 
                 <div className="text-center">
@@ -65,10 +59,10 @@ const SinopsisSection = () => {
             <Card className="noir-card sophisticated-glow">
               <CardContent className="p-8 text-center">
                 <Users className="h-10 w-10 text-secondary mx-auto mb-6" />
-                <h3 className="font-futura text-lg font-bold text-primary mb-4 uppercase tracking-wide">Los Buscadores</h3>
+                <h3 className="font-futura text-lg font-bold text-primary mb-4 uppercase tracking-wide">Los Investigadores</h3>
                 <p className="font-montserrat text-foreground/80 leading-relaxed">
-                  Lupe y Marian, dos amigos unidos por la curiosidad y la pasión por descubrir 
-                  los secretos urbanos de Valencia.
+                  Una periodista obsesiva y un psicólogo paranoico que se deciden a investigar 
+                  al Fotógrapher, evitando caer en la locura.
                 </p>
               </CardContent>
             </Card>
@@ -76,10 +70,9 @@ const SinopsisSection = () => {
             <Card className="noir-card sophisticated-glow">
               <CardContent className="p-8 text-center">
                 <Camera className="h-10 w-10 text-secondary mx-auto mb-6" />
-                <h3 className="font-futura text-lg font-bold text-primary mb-4 uppercase tracking-wide">El Fotógrafo</h3>
+                <h3 className="font-futura text-lg font-bold text-primary mb-4 uppercase tracking-wide">El Fotógrapher</h3>
                 <p className="font-montserrat text-foreground/80 leading-relaxed">
-                  Un artista enigmático que transforma personas anónimas en arte urbano, 
-                  operando desde las sombras de la ciudad.
+                  Artista urbano furtivo de Valencia que reaparece tras tres años de desaparición.
                 </p>
               </CardContent>
             </Card>
